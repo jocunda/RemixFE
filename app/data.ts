@@ -7,7 +7,7 @@ import { matchSorter } from "match-sorter";
 import sortBy from "sort-by";
 import invariant from "tiny-invariant";
 
-type ContactMutation = {
+type itemMutation = {
   id?: string;
   first?: string;
   last?: string;
@@ -17,7 +17,7 @@ type ContactMutation = {
   favorite?: boolean;
 };
 
-export type ContactRecord = ContactMutation & {
+export type itemRecord = itemMutation & {
   id: string;
   createdAt: string;
 };
@@ -25,74 +25,74 @@ export type ContactRecord = ContactMutation & {
 ////////////////////////////////////////////////////////////////////////////////
 // This is just a fake DB table. In a real app you'd be talking to a real db or
 // fetching from an existing API.
-const fakeContacts = {
-  records: {} as Record<string, ContactRecord>,
+const fakeItems = {
+  records: {} as Record<string, itemRecord>,
 
-  async getAll(): Promise<ContactRecord[]> {
-    return Object.keys(fakeContacts.records)
-      .map((key) => fakeContacts.records[key])
+  async getAll(): Promise<itemRecord[]> {
+    return Object.keys(fakeItems.records)
+      .map((key) => fakeItems.records[key])
       .sort(sortBy("-createdAt", "last"));
   },
 
-  async get(id: string): Promise<ContactRecord | null> {
-    return fakeContacts.records[id] || null;
+  async get(id: string): Promise<itemRecord | null> {
+    return fakeItems.records[id] || null;
   },
 
-  async create(values: ContactMutation): Promise<ContactRecord> {
+  async create(values: itemMutation): Promise<itemRecord> {
     const id = values.id || Math.random().toString(36).substring(2, 9);
     const createdAt = new Date().toISOString();
-    const newContact = { id, createdAt, ...values };
-    fakeContacts.records[id] = newContact;
-    return newContact;
+    const newitem = { id, createdAt, ...values };
+    fakeItems.records[id] = newitem;
+    return newitem;
   },
 
-  async set(id: string, values: ContactMutation): Promise<ContactRecord> {
-    const contact = await fakeContacts.get(id);
-    invariant(contact, `No contact found for ${id}`);
-    const updatedContact = { ...contact, ...values };
-    fakeContacts.records[id] = updatedContact;
-    return updatedContact;
+  async set(id: string, values: itemMutation): Promise<itemRecord> {
+    const item = await fakeItems.get(id);
+    invariant(item, `No item found for ${id}`);
+    const updateditem = { ...item, ...values };
+    fakeItems.records[id] = updateditem;
+    return updateditem;
   },
 
   destroy(id: string): null {
-    delete fakeContacts.records[id];
+    delete fakeItems.records[id];
     return null;
   },
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // Handful of helper functions to be called from route loaders and actions
-export async function getContacts(query?: string | null) {
+export async function getItems(query?: string | null) {
   await new Promise((resolve) => setTimeout(resolve, 500));
-  let contacts = await fakeContacts.getAll();
+  let items = await fakeItems.getAll();
   if (query) {
-    contacts = matchSorter(contacts, query, {
+    items = matchSorter(items, query, {
       keys: ["first", "last"],
     });
   }
-  return contacts.sort(sortBy("last", "createdAt"));
+  return items.sort(sortBy("last", "createdAt"));
 }
 
-export async function createEmptyContact() {
-  const contact = await fakeContacts.create({});
-  return contact;
+export async function createEmptyitem() {
+  const item = await fakeItems.create({});
+  return item;
 }
 
-export async function getContact(id: string) {
-  return fakeContacts.get(id);
+export async function getitem(id: string) {
+  return fakeItems.get(id);
 }
 
-export async function updateContact(id: string, updates: ContactMutation) {
-  const contact = await fakeContacts.get(id);
-  if (!contact) {
-    throw new Error(`No contact found for ${id}`);
+export async function updateitem(id: string, updates: itemMutation) {
+  const item = await fakeItems.get(id);
+  if (!item) {
+    throw new Error(`No item found for ${id}`);
   }
-  await fakeContacts.set(id, { ...contact, ...updates });
-  return contact;
+  await fakeItems.set(id, { ...item, ...updates });
+  return item;
 }
 
-export async function deleteContact(id: string) {
-  fakeContacts.destroy(id);
+export async function deleteitem(id: string) {
+  fakeItems.destroy(id);
 }
 
 [
@@ -308,9 +308,9 @@ export async function deleteContact(id: string) {
     last: "Jensen",
     twitter: "@jenseng",
   },
-].forEach((contact) => {
-  fakeContacts.create({
-    ...contact,
-    id: `${contact.first.toLowerCase()}-${contact.last.toLocaleLowerCase()}`,
+].forEach((item) => {
+  fakeItems.create({
+    ...item,
+    id: `${item.first.toLowerCase()}-${item.last.toLocaleLowerCase()}`,
   });
 });
