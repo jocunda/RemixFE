@@ -2,7 +2,7 @@ import { Form } from "@remix-run/react";
 import type { FunctionComponent } from "react";
 
 
-export default function Contact() {
+export default function Items() {
   const contact = {
     first: "Your",
     last: "Name",

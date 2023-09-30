@@ -34,7 +34,7 @@ export const action = async ({
   });
 };
 
-export default function item() {
+export default function Item() {
   const { item } = useLoaderData<typeof loader>();
 
 
